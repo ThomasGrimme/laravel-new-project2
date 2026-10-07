@@ -31,30 +31,30 @@ class CategorieController extends Controller
         return redirect()->route('categories.index')->with('success', 'Category created successfully.');
     }
 
-    public function edit(Categorie $categorie)
+    public function edit(Categorie $category)
     {
-        return view('categories.edit', ['category' => $categorie]);
+        return view('categories.edit', compact('category'));
     }
 
-    public function update(Request $request, Categorie $categorie)
+    public function update(Request $request, Categorie $category)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,'.$categorie->id,
+            'name' => 'required|string|max:255|unique:categories,name,'.$category->id,
             'description' => 'nullable|string',
         ]);
 
-        $categorie->update($validated);
+        $category->update($validated);
 
         return redirect()->route('categories.index')->with('success', 'Category updated successfully.');
     }
 
-    public function destroy(Categorie $categorie)
+    public function destroy(Categorie $category)
     {
-        if ($categorie->posts()->exists() || $categorie->products()->exists()) {
+        if ($category->posts()->exists() || $category->products()->exists()) {
             return back()->with('error', 'Cannot delete a category that still has posts or products.');
         }
 
-        $categorie->delete();
+        $category->delete();
 
         return redirect()->route('categories.index')->with('success', 'Category deleted successfully.');
     }

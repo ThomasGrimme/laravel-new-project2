@@ -68,8 +68,21 @@ class OrderController extends Controller
             abort(403);
         }
 
-        $order->load('items.product');
+        $order->load('items.product', 'user');
 
-        return view('orders.show', compact('order'));
+        $backRoute = auth()->user()->isAdmin() && $order->user_id !== auth()->id()
+            ? 'admin.orders.index'
+            : 'orders.index';
+
+        return view('orders.show', compact('order', 'backRoute'));
+    }
+
+    public function adminIndex()
+    {
+        $orders = Order::with(['user', 'items'])
+            ->latest()
+            ->paginate(10);
+
+        return view('orders.admin-index', compact('orders'));
     }
 }

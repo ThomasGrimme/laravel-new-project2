@@ -13,43 +13,46 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('posts.index')" :active="request()->routeIs('posts.*')">
-                        {{ __('Blog') }}
+                        {{ __('blog.text') }}
                     </x-nav-link>
                     <x-nav-link :href="route('shop.index')" :active="request()->routeIs('shop.*')">
-                        {{ __('Shop') }}
+                        {{ __('shop.text') }}
                     </x-nav-link>
                     @auth
                         <x-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">
-                            {{ __('Cart') }}
+                            {{ __('cart.text') }}
                             @php
                                 $cartCount = auth()->user()->cart ? auth()->user()->cart->items->sum('quantity') : 0;
                             @endphp
                             @if($cartCount > 0)
-                                <span class="ml-1 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">{{ $cartCount }}</span>
+                                <span class="ml-1 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-600 rounded-full">{{ $cartCount }}</span>
                             @endif
                         </x-nav-link>
                         <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
-                            {{ __('Orders') }}
+                            {{ __('orders.text') }}
                         </x-nav-link>
                         <x-nav-link :href="route('products.myProducts')" :active="request()->routeIs('products.myProducts')">
-                            {{ __('My Products') }}
+                            {{ __('my_products.text') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('posts.myPosts')" :active="request()->routeIs('posts.myPosts', 'posts.create', 'posts.edit', 'posts.store', 'posts.update', 'posts.destroy')">
+                            {{ __('my_posts.text') }}
                         </x-nav-link>
                     @endauth
                     @auth
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                            {{ __('Dashboard') }}
+                            {{ __('dashboard.text') }}
                         </x-nav-link>
                     @endauth
                     @auth
                         @if(auth()->user()->isAdmin())
                             <x-nav-link :href="route('admin.categories.index')" :active="request()->routeIs('admin.categories.*')">
-                                {{ __('Categories') }}
+                                {{ __('categories.text') }}
                             </x-nav-link>
                             <x-nav-link :href="route('admin.tags.index')" :active="request()->routeIs('admin.tags.*')">
-                                {{ __('Tags') }}
+                                {{ __('tags.text') }}
                             </x-nav-link>
-                            <x-nav-link :href="route('admin.posts.create')" :active="request()->routeIs('admin.posts.*')">
-                                {{ __('New Post') }}
+                            <x-nav-link :href="route('admin.orders.index')" :active="request()->routeIs('admin.orders.*')">
+                                {{ __('all_orders.text') }}
                             </x-nav-link>
                         @endif
                     @endauth
@@ -74,7 +77,7 @@
 
                         <x-slot name="content">
                             <x-dropdown-link :href="route('profile.edit')">
-                                {{ __('Profile') }}
+                                {{ __('profile.text') }}
                             </x-dropdown-link>
 
                             <!-- Authentication -->
@@ -84,7 +87,7 @@
                                 <x-dropdown-link :href="route('logout')"
                                         onclick="event.preventDefault();
                                                     this.closest('form').submit();">
-                                    {{ __('Log Out') }}
+                                    {{ __('log_out.text') }}
                                 </x-dropdown-link>
                             </form>
                         </x-slot>
@@ -93,17 +96,15 @@
             @else
                 <div class="hidden sm:flex sm:items-center sm:ms-6 space-x-4">
                     <a href="{{ route('login') }}" class="text-sm text-gray-700 underline hover:text-gray-900">
-                        {{ __('Log in') }}
+                        {{ __('log_in.text') }}
                     </a>
-                    <a href="{{ route('register') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                        {{ __('Register') }}
-                    </a>
+                    <x-button href="{{ route('register') }}">{{ __('register.text') }}</x-button>
                 </div>
             @endauth
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
+                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-600 transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -117,35 +118,38 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('posts.index')" :active="request()->routeIs('posts.*')">
-                {{ __('Blog') }}
+                {{ __('blog.text') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('shop.index')" :active="request()->routeIs('shop.*')">
-                {{ __('Shop') }}
+                {{ __('shop.text') }}
             </x-responsive-nav-link>
             @auth
                 <x-responsive-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">
-                    {{ __('Cart') }}
+                    {{ __('cart.text') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
-                    {{ __('Orders') }}
+                    {{ __('orders.text') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('products.myProducts')" :active="request()->routeIs('products.myProducts')">
-                    {{ __('My Products') }}
+                    {{ __('my_products.text') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('posts.myPosts')" :active="request()->routeIs('posts.myPosts', 'posts.create', 'posts.edit', 'posts.store', 'posts.update', 'posts.destroy')">
+                    {{ __('my_posts.text') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                    {{ __('Dashboard') }}
+                    {{ __('dashboard.text') }}
                 </x-responsive-nav-link>
             @endauth
             @auth
                 @if(auth()->user()->isAdmin())
                     <x-responsive-nav-link :href="route('admin.categories.index')" :active="request()->routeIs('admin.categories.*')">
-                        {{ __('Categories') }}
+                        {{ __('categories.text') }}
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('admin.tags.index')" :active="request()->routeIs('admin.tags.*')">
-                        {{ __('Tags') }}
+                        {{ __('tags.text') }}
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('admin.posts.create')" :active="request()->routeIs('admin.posts.*')">
-                        {{ __('New Post') }}
+                    <x-responsive-nav-link :href="route('admin.orders.index')" :active="request()->routeIs('admin.orders.*')">
+                        {{ __('all_orders.text') }}
                     </x-responsive-nav-link>
                 @endif
             @endauth
@@ -161,7 +165,7 @@
 
                 <div class="mt-3 space-y-1">
                     <x-responsive-nav-link :href="route('profile.edit')">
-                        {{ __('Profile') }}
+                        {{ __('profile.text') }}
                     </x-responsive-nav-link>
 
                     <!-- Authentication -->
@@ -171,7 +175,7 @@
                         <x-responsive-nav-link :href="route('logout')"
                                 onclick="event.preventDefault();
                                             this.closest('form').submit();">
-                            {{ __('Log Out') }}
+                            {{ __('log_out.text') }}
                         </x-responsive-nav-link>
                     </form>
                 </div>
@@ -180,10 +184,10 @@
             <div class="pt-4 pb-1 border-t border-gray-200">
                 <div class="mt-3 space-y-1">
                     <x-responsive-nav-link :href="route('login')">
-                        {{ __('Log in') }}
+                        {{ __('log_in.text') }}
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('register')">
-                        {{ __('Register') }}
+                        {{ __('register.text') }}
                     </x-responsive-nav-link>
                 </div>
             </div>

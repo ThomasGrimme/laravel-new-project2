@@ -1,95 +1,90 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center gap-2">
-            <a href="{{ route('shop.index') }}" class="text-gray-500 hover:text-gray-700">&larr; Back</a>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ $product->name }}
-            </h2>
-        </div>
+        <a href="{{ route('shop.index') }}" class="inline-flex items-center gap-1.5 text-sm text-gray-500 transition hover:text-gray-900">
+            <span aria-hidden="true">&larr;</span> {{ __('back_to_shop.text') }}
+        </a>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="md:flex">
+    <div class="py-10">
+        <div class="mx-auto max-w-5xl sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+                <div class="overflow-hidden rounded-lg bg-gray-100">
                     @if($product->image)
-                        <div class="md:w-1/2">
-                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-64 md:h-full object-cover">
-                        </div>
+                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="h-64 w-full object-cover md:h-full md:min-h-[420px]">
                     @else
-                        <div class="md:w-1/2 bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center h-64 md:h-auto md:min-h-[400px]">
-                            <span class="text-white text-6xl">${{ number_format($product->price, 2) }}</span>
+                        <div class="flex h-64 w-full items-center justify-center md:min-h-[420px]">
+                            <span class="font-serif text-6xl text-gray-900">&euro;{{ number_format($product->price, 2) }}</span>
                         </div>
                     @endif
-                    <div class="md:w-1/2 p-6">
-                        <div class="flex items-center gap-2 mb-4">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                {{ $product->category->name }}
-                            </span>
-                            @if($product->inStock())
-                                <span class="text-sm text-green-600">{{ $product->stock }} in stock</span>
-                            @else
-                                <span class="text-sm text-red-600">Out of stock</span>
-                            @endif
-                        </div>
+                </div>
 
-                        <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ $product->name }}</h1>
-                        <p class="text-3xl font-bold text-indigo-600 mb-4">&euro;{{ number_format($product->price, 2) }}</p>
-
-                        @if($product->description)
-                            <div class="text-gray-600 mb-6">
-                                {!! nl2br(e($product->description)) !!}
-                            </div>
+                <div class="flex flex-col">
+                    <div class="flex items-center gap-2 text-xs text-gray-500">
+                        <span class="font-medium text-gray-700">{{ $product->category->name }}</span>
+                        <span aria-hidden="true">&middot;</span>
+                        @if($product->inStock())
+                            <span class="text-green-700">{{ __('count_in_stock.text', ['count' => $product->stock]) }}</span>
+                        @else
+                            <span class="text-red-600">{{ __('out_of_stock.text') }}</span>
                         @endif
+                    </div>
 
-                        @if($product->post)
-                            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-                                <p class="text-sm text-gray-500 mb-1">Related blog post:</p>
-                                <a href="{{ route('posts.show', $product->post) }}" class="text-indigo-600 hover:text-indigo-900 font-medium">
-                                    {{ $product->post->title }} &rarr;
-                                </a>
-                            </div>
-                        @endif
+                    <h1 class="mt-3 text-2xl font-semibold leading-tight text-gray-900">{{ $product->name }}</h1>
 
-                        <div class="text-sm text-gray-500 mb-6">
-                            Listed by {{ $product->user->name }}
+                    <p class="mt-2 font-serif text-3xl text-gray-900">
+                        &euro;{{ number_format($product->price, 2) }}
+                    </p>
+
+                    @if($product->description)
+                        <div class="mt-5 break-words text-sm leading-[1.8] text-gray-700">
+                            {!! nl2br(e($product->description)) !!}
                         </div>
+                    @endif
 
+                    @if($product->post)
+                        <div class="mt-6 rounded-lg bg-gray-50 p-4">
+                            <p class="text-xs text-gray-500">{{ __('related_blog_post.text') }}</p>
+                            <a href="{{ route('posts.show', $product->post) }}" class="mt-0.5 inline-block text-sm font-medium text-gray-900 underline decoration-gray-300 underline-offset-4 transition hover:decoration-gray-900">
+                                {{ $product->post->title }}
+                            </a>
+                        </div>
+                    @endif
+
+                    <p class="mt-6 text-xs text-gray-500">
+                        {{ __('listed_by_name.text', ['name' => $product->user->name]) }}
+                    </p>
+
+                    <div class="mt-auto pt-8">
                         @auth
                             @if($product->inStock())
                                 <form action="{{ route('cart.add') }}" method="POST" class="flex items-center gap-3">
                                     @csrf
                                     <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                    <div class="flex items-center border border-gray-300 rounded-md">
-                                        <button type="button" onclick="this.nextElementSibling.stepDown()" class="px-3 py-2 text-gray-600 hover:text-gray-900">-</button>
-                                        <input type="number" name="quantity" value="1" min="1" max="{{ $product->stock }}" class="w-16 text-center border-0 focus:ring-0">
-                                        <button type="button" onclick="this.previousElementSibling.stepUp()" class="px-3 py-2 text-gray-600 hover:text-gray-900">+</button>
+                                    <div class="flex items-center rounded-md border border-gray-300">
+                                        <button type="button" onclick="this.nextElementSibling.stepDown()" aria-label="{{ __('decrease_quantity.text') }}" class="px-3 py-2 text-gray-500 transition hover:text-gray-900">&minus;</button>
+                                        <input type="number" name="quantity" value="1" min="1" max="{{ $product->stock }}" aria-label="{{ __('quantity.text') }}" class="w-14 border-0 p-0 text-center focus:ring-0">
+                                        <button type="button" onclick="this.previousElementSibling.stepUp()" aria-label="{{ __('increase_quantity.text') }}" class="px-3 py-2 text-gray-500 transition hover:text-gray-900">+</button>
                                     </div>
-                                    <button type="submit" class="inline-flex items-center px-6 py-3 bg-indigo-600 border border-transparent rounded-md font-semibold text-sm text-white uppercase tracking-widest hover:bg-indigo-500 focus:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                        Add to Cart
-                                    </button>
+                                    <x-button size="lg">{{ __('add_to_cart.text') }}</x-button>
                                 </form>
                             @else
-                                <p class="text-red-600 font-medium">This product is currently out of stock.</p>
+                                <p class="text-sm font-medium text-red-600">{{ __('this_product_is_currently_out_of_stock.text') }}</p>
                             @endif
                         @else
-                            <p class="text-gray-500">
-                                <a href="{{ route('login') }}" class="text-indigo-600 hover:text-indigo-900">Log in</a> to add to cart.
+                            <p class="text-sm text-gray-500">
+                                <a href="{{ route('login') }}" class="font-medium text-gray-900 underline decoration-gray-300 underline-offset-4 transition hover:decoration-gray-900">{{ __('log_in.text') }}</a>
+                                {{ __('to_add_to_cart.text') }}
                             </p>
                         @endauth
 
                         @auth
                             @if($product->user_id === auth()->id() || auth()->user()->isAdmin())
-                                <div class="mt-6 pt-6 border-t border-gray-200 flex gap-2">
-                                    <a href="{{ route('products.edit', $product) }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                        Edit
-                                    </a>
-                                    <form action="{{ route('products.destroy', $product) }}" method="POST" onsubmit="return confirm('Delete this product?')">
+                                <div class="mt-6 flex items-center gap-2 border-t border-gray-200 pt-6">
+                                    <x-button variant="secondary" size="sm" href="{{ route('products.edit', $product) }}">{{ __('edit.text') }}</x-button>
+                                    <form method="POST" action="{{ route('products.destroy', $product) }}" onsubmit="return confirm('{{ __('delete_this_product.text') }}')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                            Delete
-                                        </button>
+                                        <x-button variant="danger-ghost" size="sm">{{ __('delete.text') }}</x-button>
                                     </form>
                                 </div>
                             @endif

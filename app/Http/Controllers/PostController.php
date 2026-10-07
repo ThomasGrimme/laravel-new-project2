@@ -48,6 +48,8 @@ class PostController extends Controller
 
     public function create()
     {
+        $this->authorize('create', Post::class);
+
         $categories = Categorie::all();
         $tags = Tag::all();
 
@@ -56,6 +58,8 @@ class PostController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create', Post::class);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
@@ -77,11 +81,24 @@ class PostController extends Controller
         $post = Post::create($validated);
         $post->tags()->sync($tags);
 
-        return redirect()->route('posts.index')->with('success', 'Post created successfully.');
+        return redirect()->route('posts.show', $post)->with('success', 'Post created successfully.');
+    }
+
+    public function myPosts()
+    {
+        $posts = auth()->user()
+            ->posts()
+            ->with(['category', 'tags'])
+            ->latest()
+            ->paginate(9);
+
+        return view('posts.my-posts', compact('posts'));
     }
 
     public function edit(Post $post)
     {
+        $this->authorize('update', $post);
+
         $categories = Categorie::all();
         $tags = Tag::all();
         $post->load('tags');
@@ -91,6 +108,8 @@ class PostController extends Controller
 
     public function update(Request $request, Post $post)
     {
+        $this->authorize('update', $post);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
@@ -113,17 +132,19 @@ class PostController extends Controller
         $post->update($validated);
         $post->tags()->sync($tags);
 
-        return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
+        return redirect()->route('posts.show', $post)->with('success', 'Post updated successfully.');
     }
 
     public function destroy(Post $post)
     {
+        $this->authorize('delete', $post);
+
         if ($post->image) {
             Storage::disk('public')->delete($post->image);
         }
 
         $post->delete();
 
-        return redirect()->route('posts.index')->with('success', 'Post deleted successfully.');
+        return redirect()->route('posts.myPosts')->with('success', 'Post deleted successfully.');
     }
 }
